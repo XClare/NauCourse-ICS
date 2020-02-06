@@ -10,6 +10,7 @@ import net.fortuna.ical4j.model.property.*
 import net.fortuna.ical4j.util.RandomUidGenerator
 import tool.naucourse.ics.Constants
 import tool.naucourse.ics.contents.beans.Course
+import tool.naucourse.ics.contents.beans.Exam
 import tool.naucourse.ics.contents.beans.TermDate
 import java.io.File
 import java.io.FileOutputStream
@@ -17,10 +18,10 @@ import java.util.*
 import java.util.Locale
 
 
-object CourseSetConvert {
+object ICSConverter {
     private val uidGenerator = RandomUidGenerator()
 
-    fun convertToICS(courseSet: Set<Course>, termDate: TermDate, output: File) {
+    private fun getInitCal(): Calendar {
         val ics = Calendar()
 
         ics.properties.add(ProdId("-//Author: ${Constants.AUTHOR}//Produced By: ${Constants.APPLICATION_NAME}//Version: ${Constants.VERSION}"))
@@ -37,6 +38,12 @@ object CourseSetConvert {
 
         if (vTimeZone != null) ics.properties.add(vTimeZone.timeZoneId)
 
+        return ics
+    }
+
+    fun convertCourse(courseSet: Set<Course>, termDate: TermDate, output: File) {
+        val ics = getInitCal()
+
         var courseSummary: String
         var courseText: String
         var startTime: Date
@@ -45,6 +52,7 @@ object CourseSetConvert {
 
         for (course in courseSet) {
             courseSummary = "ID：${course.id}\n" +
+                    "名称：${course.name}\n" +
                     "合班号：${course.courseClass ?: "无"}\n" +
                     "教学班：${course.teachClass}\n" +
                     "老师：${course.teacher}\n" +
@@ -74,6 +82,7 @@ object CourseSetConvert {
                                 startTime,
                                 endTime,
                                 courseText,
+                                courseTime.location,
                                 courseSummary
                             )
                             ics.components.add(event)
@@ -92,6 +101,7 @@ object CourseSetConvert {
         startTime: Date,
         endTime: Date,
         text: String,
+        location: String,
         summary: String
     ): VEvent {
         val event = VEvent()
@@ -101,6 +111,7 @@ object CourseSetConvert {
             add(Summary(text))
             add(uidGenerator.generateUid())
             add(Description(summary))
+            add(Location(location))
         }
         return event
     }
@@ -131,5 +142,30 @@ object CourseSetConvert {
         calendar.set(java.util.Calendar.MINUTE, Constants.Course.COURSE_TIME[courseEndNum - 1][3])
         calendar.set(java.util.Calendar.SECOND, 0)
         return calendar.time
+    }
+
+    fun convertExam(examData: Array<Exam>, output: File) {
+        val ics = getInitCal()
+
+        var examText: String
+        var examSummary: String
+        var event: VEvent
+
+        examData.forEach {
+            examText = "[考试] ${it.name}"
+            examSummary = "ID: ${it.courseId}\n" +
+                    "名称：${it.name}\n" +
+                    "教学班：${it.teachClass}\n" +
+                    "地点：${it.location}\n" +
+                    "学分：${it.credit}\n" +
+                    "课程性质：${it.property}\n" +
+                    "课程类别：${it.type}"
+            event = createEvent(it.startDate, it.endDate, examText, it.location, examSummary)
+            ics.components.add(event)
+        }
+
+        FileOutputStream(output).use {
+            CalendarOutputter().output(ics, it)
+        }
     }
 }
