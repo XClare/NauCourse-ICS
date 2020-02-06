@@ -25,9 +25,13 @@ cache:
 deploy:
   provider: releases
   token: $GITHUB_TOKEN
+  file_glob: true
   file: "release/*.jar"
   on:
     tags: true
+    branches:
+      only:
+        - master
 
 notifications:
   email:
