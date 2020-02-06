@@ -6,7 +6,7 @@ import java.util.*
 object Constants {
     const val APPLICATION_NAME = "NauCourse-ICS"
     const val AUTHOR = "XClare"
-    const val VERSION = "1.0.1"
+    const val VERSION = "1.0.2"
 
     const val SPACE = " "
 

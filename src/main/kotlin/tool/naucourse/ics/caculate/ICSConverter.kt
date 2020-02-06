@@ -10,6 +10,7 @@ import net.fortuna.ical4j.model.property.*
 import net.fortuna.ical4j.util.RandomUidGenerator
 import tool.naucourse.ics.Constants
 import tool.naucourse.ics.contents.beans.Course
+import tool.naucourse.ics.contents.beans.CourseTime
 import tool.naucourse.ics.contents.beans.Exam
 import tool.naucourse.ics.contents.beans.TermDate
 import java.io.File
@@ -64,7 +65,16 @@ object ICSConverter {
                 courseText = "${course.name}@${courseTime.location}"
 
                 for (week in courseTime.weeks) {
-                    for (i in week.start..week.end) {
+                    var stepNum = 1
+                    var startNum = week.start
+                    val endNum = week.end
+                    if (courseTime.weeksMode == CourseTime.WeeksMode.DOUBLE) {
+                        startNum += 1
+                        stepNum = 2
+                    } else if (courseTime.weeksMode == CourseTime.WeeksMode.SINGLE) {
+                        stepNum = 2
+                    }
+                    for (i in startNum..endNum step stepNum) {
                         for (time in courseTime.courseNum) {
                             startTime = getStartTime(
                                 i,
