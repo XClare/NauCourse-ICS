@@ -66,7 +66,7 @@ object ICSConverter {
                     if (week.end == week.start) {
                         addEventByCourseTime(ics, courseTime, week.start, termDate, courseText, courseSummary)
                     } else {
-                        val rRule = getRRule(courseTime, week)
+                        val rRule = getRRule(courseTime, week, termDate)
                         val weekNum = getFirstWeekNum(courseTime, week)
                         addEventByCourseTime(ics, courseTime, weekNum, termDate, courseText, courseSummary, rRule)
                     }
@@ -97,7 +97,7 @@ object ICSConverter {
         else -> week.start
     }
 
-    private fun getRRule(courseTime: CourseTime, week: CourseTime.Time): RRule? =
+    private fun getRRule(courseTime: CourseTime, week: CourseTime.Time, termDate: TermDate): RRule? =
         when (courseTime.weeksMode) {
             CourseTime.WeeksMode.DOUBLE -> {
                 val recur = Recur.Builder().apply {
@@ -106,6 +106,7 @@ object ICSConverter {
                     interval(2)
                     dayList(WeekDayList(getWeekDay(courseTime.weekDay)))
                     weekStartDay(WeekDay.Day.MO)
+                    until(net.fortuna.ical4j.model.Date(getWeekDay(week.end, 7, termDate)))
                 }.build()
                 RRule(recur)
             }
@@ -116,6 +117,7 @@ object ICSConverter {
                     interval(2)
                     dayList(WeekDayList(getWeekDay(courseTime.weekDay)))
                     weekStartDay(WeekDay.Day.MO)
+                    until(net.fortuna.ical4j.model.Date(getWeekDay(week.end, 7, termDate)))
                 }.build()
                 RRule(recur)
             }
@@ -126,6 +128,7 @@ object ICSConverter {
                     interval(1)
                     dayList(WeekDayList(getWeekDay(courseTime.weekDay)))
                     weekStartDay(WeekDay.Day.MO)
+                    until(net.fortuna.ical4j.model.Date(getWeekDay(week.end, 7, termDate)))
                 }.build()
                 RRule(recur)
             }
