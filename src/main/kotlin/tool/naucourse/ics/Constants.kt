@@ -6,7 +6,7 @@ import java.util.*
 object Constants {
     const val APPLICATION_NAME = "NauCourse-ICS"
     const val AUTHOR = "XClare"
-    const val VERSION = "1.0.2"
+    const val VERSION = "1.0.3"
 
     const val SPACE = " "
 
@@ -26,8 +26,8 @@ object Constants {
     }
 
     object Time {
-        const val MIN_WEEK_DAY = 0
-        const val MAX_WEEK_DAY = 6
+        const val MIN_WEEK_DAY = 1
+        const val MAX_WEEK_DAY = 7
         val DATE_FORMAT_YMD = SimpleDateFormat("yyyy-MM-dd", Locale.CHINA)
         val DATE_FORMAT_YMD_HM_CH = SimpleDateFormat("yyyy年MM月dd日 HH:mm", Locale.CHINA)
     }
